@@ -78,15 +78,20 @@ Streamlit, khác với OAuth App "Streamlit" đã thấy tại
 
 ## 7. Việc cần làm tiếp theo
 
-1. Hoàn tất deploy trên share.streamlit.io (xem mục 2) và xác nhận app chạy
-   được tại URL dạng `https://xxx.streamlit.app`.
-2. Lưu lại URL app sau khi deploy thành công.
-3. Lưu ý quan trọng về vận hành trên cloud: **filesystem của Streamlit Cloud
-   là tạm thời** — nếu dùng nút "Thêm mã" / "Cập nhật dữ liệu" trên bản cloud,
-   thay đổi sẽ **mất khi app khởi động lại** (app tự ngủ sau thời gian không
-   dùng) vì không tự động commit/push ngược về GitHub. Muốn thêm mã/cập nhật
-   dữ liệu lâu dài, nên làm ở bản local rồi `git push`, hoặc yêu cầu bổ sung
-   tính năng tự commit-push khi cập nhật trên cloud (chưa làm).
+1. **[Cần bạn thao tác thủ công trên trình duyệt — không tự động hoá được vì
+   cần đăng nhập GitHub OAuth của bạn]** Hoàn tất deploy trên share.streamlit.io:
+   vào https://share.streamlit.io → đăng nhập GitHub `hongvan210982-lang` →
+   Deploy an app → repo `hongvan210982-lang/phan-tich-chung-khoan`, branch
+   `main`, main file `app.py` → Deploy.
+2. Sau khi deploy xong, lưu lại URL dạng `https://xxx.streamlit.app` (báo lại
+   cho Claude để cập nhật mục này).
+3. **[Đã làm]** Tính năng tự động commit + push dữ liệu khi cập nhật trên
+   cloud đã được thêm (`stock_tool/git_sync.py`, gọi từ `app.py` sau mỗi lần
+   "Thêm mã"/"Cập nhật dữ liệu mới nhất"). Mặc định **tắt** — cần cấu hình
+   secret `GITHUB_TOKEN` trên Streamlit Cloud (App settings → Secrets) mới
+   kích hoạt. Không có token thì bỏ qua lặng lẽ, không ảnh hưởng chạy local.
+   Chi tiết cách tạo token & cấu hình: xem mục "Đồng bộ dữ liệu tự động lên
+   GitHub" trong `README.md`.
 4. (Tuỳ chọn) Nếu muốn quay lại private repo: cần giải quyết dứt điểm việc cấp
    quyền GitHub App cho Streamlit trước khi đổi visibility lại.
 

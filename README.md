@@ -51,6 +51,29 @@ Sidebar → "Cập nhật / thêm mã mới" → bấm **Cập nhật dữ liệ
 sẽ lấy các phiên giao dịch mới hơn ngày cuối cùng đang có cho từng mã, gộp vào
 dữ liệu cũ và ghi đè file.
 
+## Đồng bộ dữ liệu tự động lên GitHub (khi chạy trên Streamlit Cloud)
+
+Filesystem của Streamlit Community Cloud là tạm thời — file CSV lưu qua nút
+"Thêm mã" / "Cập nhật dữ liệu mới nhất" sẽ **mất khi app khởi động lại** (app
+tự ngủ sau thời gian không dùng) nếu không được đẩy ngược về GitHub.
+
+Để bật đồng bộ tự động: vào app trên share.streamlit.io → **⋮ (menu) → Settings
+→ Secrets**, thêm:
+
+```
+GITHUB_TOKEN = "ghp_xxxxxxxxxxxxxxxxxxxx"
+```
+
+Token tạo tại GitHub → Settings → Developer settings → Personal access tokens,
+cần quyền ghi vào repo `hongvan210982-lang/phan-tich-chung-khoan` (fine-grained:
+`Contents: Read and write`, hoặc classic scope `repo`). Sau khi thêm secret, mỗi
+lần bấm "Thêm mã" hoặc "Cập nhật dữ liệu mới nhất" trên bản cloud, công cụ sẽ tự
+`git commit` + `git push` thư mục `Dữ liệu thô/` về nhánh đang deploy.
+
+Chạy local mà không cấu hình `GITHUB_TOKEN` thì tính năng này tự bỏ qua, không
+ảnh hưởng gì — bạn vẫn tự `git add`/`git commit`/`git push` như bình thường.
+Xem code tại `stock_tool/git_sync.py`.
+
 ## Mở rộng khoảng thời gian
 
 Chỉ cần chọn lại khoảng ngày ở thanh trượt ngày trong sidebar — toàn bộ biểu

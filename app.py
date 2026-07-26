@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from plotly.subplots import make_subplots
 
-from stock_tool import data_fetcher, data_io, indicators, metrics, scoring
+from stock_tool import data_fetcher, data_io, git_sync, indicators, metrics, scoring
 
 # ---- Bảng màu (theo hệ màu chuẩn hoá: categorical cố định thứ tự + status) ----
 COLOR_UP = "#0ca30c"       # status good — nến tăng
@@ -37,6 +37,16 @@ def get_data() -> dict[str, pd.DataFrame]:
 def refresh_data():
     _load_all_data.clear()
     st.session_state.data = _load_all_data()
+
+
+def _sync_and_notify(commit_message: str) -> None:
+    result = git_sync.sync_data_dir(commit_message)
+    if result == "skip":
+        return
+    if result.startswith("Đã đồng bộ") or result.startswith("Không có thay đổi"):
+        st.toast(result, icon="✅")
+    else:
+        st.warning(f"Đồng bộ GitHub: {result}")
 
 
 def filter_by_date(df: pd.DataFrame, start: date, end: date) -> pd.DataFrame:
@@ -90,6 +100,7 @@ with st.sidebar.expander("Cập nhật / thêm mã mới", expanded=False):
             st.error("Một số mã lỗi:\n" + "\n".join(errors))
         else:
             st.success("Đã cập nhật dữ liệu mới nhất cho tất cả các mã.")
+        _sync_and_notify(f"Cập nhật dữ liệu tự động ({date.today().isoformat()})")
         st.rerun()
 
     st.divider()
@@ -108,6 +119,7 @@ with st.sidebar.expander("Cập nhật / thêm mã mới", expanded=False):
                     data_io.save_ticker_data(new_ticker, df_new)
                 refresh_data()
                 st.success(f"Đã thêm mã {new_ticker} ({len(df_new)} phiên giao dịch).")
+                _sync_and_notify(f"Thêm mã {new_ticker}")
                 st.rerun()
             except data_fetcher.FetchError as e:
                 st.error(str(e))
