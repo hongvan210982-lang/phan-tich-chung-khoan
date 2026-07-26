@@ -1,0 +1,11 @@
+streamlit
+plotly
+pandas
+numpy
+matplotlib
+vnstock==0.2.9.2.3
+beautifulsoup4
+lxml
+html5lib
+ipython
+openpyxl
